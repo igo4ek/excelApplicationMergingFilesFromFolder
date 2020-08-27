@@ -128,6 +128,8 @@
 А участников, допустим, может быть 11 369. 
 Получается 5 файлов по 2000 участников и один с 1 369 участником. 
 Эта программа и объединяет эти выгрузки в один цельный файл.
+
+
 </value>
   </data>
   <metadata name="A.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">

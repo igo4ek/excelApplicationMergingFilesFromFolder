@@ -21,13 +21,6 @@ namespace excelApplicationFindAndCopy
         Excel.Application xlApp = new Excel.Application();
         Excel.Workbook workBook;
 
-        // основной поток
-        Thread formThread = Thread.CurrentThread;
-        // поток с расчётами
-        Thread calcThread;
-        // поток, ожидающий завершения потока с расчетами
-        Thread watchdog;
-
         // объект, содержащий все делегаты
         myDelegates delegates = new myDelegates();
 
@@ -97,7 +90,7 @@ namespace excelApplicationFindAndCopy
                 // количество листов:
                 int sheetsCount = workBook.Worksheets.Count;
 
-                richTextBox2.AppendText("Начинаем объекдинять листы...\n");
+                richTextBox2.AppendText("Начинаем объединять листы...\n");
                 richTextBox2.ScrollToCaret();
                 // Подготовка к объединению содержимого листов
                 Excel.Worksheet pastedSheet = workBook.Worksheets[1];   // лист, в который будем вставлять
@@ -141,32 +134,6 @@ namespace excelApplicationFindAndCopy
             {
                 MessageBox.Show("Некорректно выбранная папка!", "Выбор папки...", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
-            }
-        }
-
-        // Действия по завершению работы рабочего потока: Показать Лист3
-        void Watch()
-        {
-            calcThread.Join();
-            listBox1.Invoke(delegates.listBoxSelectedIndexChanger, new object[] { listBox1, 2 });
-            MessageBox.Show("готово");
-        }
-
-        // Главная функция с расчетами
-        void mainExcelFunction()
-        {
-            
-            try
-            {
-                
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show("Во время работы произошел сбой.\n" + exc.Message + "\n\nОбратитесь к Разработчику.\nРекомендуется не сохранять изменения в файле.");
-            }
-            finally
-            {
-                richTextBox2.Invoke(delegates.richTextBoxUpdater, new object[] { "\n\nДело сделано, программу можно закрывать. \n\n", richTextBox2 });
             }
         }
 
