@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +25,8 @@ namespace excelApplicationFindAndCopy
         // объект, содержащий все делегаты
         myDelegates delegates = new myDelegates();
 
+        bool isDataGridViewFilled = false;
+
         public Form1()
         {
             InitializeComponent();
@@ -33,7 +36,7 @@ namespace excelApplicationFindAndCopy
             //t6.SetToolTip(checkBox1, "Выводит в логи дополнительную информацию: что где найдено и какой диапазон ячеек при этом будет скопирован.\nНемного замедляет скорость отработки.");
         }
 
-        // Кнопка "Файл..."
+
         
         // ЗАПОЛНЕНИЕ DATA_GRID_VIEW СОДЕРЖИМЫМ
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -52,8 +55,14 @@ namespace excelApplicationFindAndCopy
             }
             finally
             {
-
+                isDataGridViewFilled = true;
             }
+        }
+
+        // для быстрого вывода текста на richTextBox2
+        void print(string text)
+        {
+            richTextBox2.Invoke(delegates.richTextBoxUpdater, new object[] { text, richTextBox2 });
         }
 
         // Выбор папки и склейка всех находящихся так екселей в один
@@ -66,23 +75,36 @@ namespace excelApplicationFindAndCopy
             {
                 path = folderBrowserDialog1.SelectedPath;
 
+                print("Шаг 1. Начало объединения файлов в один на отдельные листы.\n\n");
                 string[] allFiles = Directory.GetFiles(path);
+                //// если файл всего один в папке
+                //if (allFiles.Length == 1)
+                //{
+                //    MessageBox.Show("Тут всего один файл.\nТут объединять нечего.\n\nВыберите папку, содержащую более чем один файл!");
+                //    return;
+                //}
+                print("Порядок объединения файлов:\n");
+                foreach (String file in allFiles)
+                {
+                    print(file + "\n");
+                }
                 // Объединение всех файлов в один
                 for (int i = 1; i < allFiles.Length; i++)
                 {
                     myExcel.copySheetFromFileToFile(allFiles[i], allFiles[0], "Лист" + (i + 1));
                 }
+                print("\nФайл из листов сформирован.\n\n");
 
-                richTextBox2.AppendText("Начало объединения файлов в один на отдельные листы\n");
+                print("\nОткрытие файла...\n\n");
                 // теперь все файлы находятся по пути allFiles[0] каждый файл в отдельном листе
                 xlFileName = allFiles[0];
                 if (!myExcel.checkWritingAvaliable(xlFileName, xlApp))
                 {
-                    richTextBox2.AppendText("!!! ФАЙЛ ЗАБЛОКИРОВАН ДРУГИМ ПОЛЬЗОВАТЕЛЕМ !!!\nЗакройте его в  Microsoft Excel и загрузите заново.\n\n");
+                    print("!!! ФАЙЛ ЗАБЛОКИРОВАН ДРУГИМ ПОЛЬЗОВАТЕЛЕМ !!!\nЗакройте его в  Microsoft Excel и загрузите заново.\n\n");
                     xlFileName = "";
                     return;
                 }
-                richTextBox2.AppendText("Файл из листов сформирован\n");
+                
 
                 // книга
                 workBook = xlApp.Workbooks.Open(xlFileName, false, false); //открываем наш файл
@@ -90,8 +112,7 @@ namespace excelApplicationFindAndCopy
                 // количество листов:
                 int sheetsCount = workBook.Worksheets.Count;
 
-                richTextBox2.AppendText("Начинаем объединять листы...\n");
-                richTextBox2.ScrollToCaret();
+                print("Шаг 2. Начинаем объединять листы (" + sheetsCount + ")...\n");
                 // Подготовка к объединению содержимого листов
                 Excel.Worksheet pastedSheet = workBook.Worksheets[1];   // лист, в который будем вставлять
                 int rowPasted = myExcel.getRowsCount(pastedSheet) - 1;  // строка, в которую будем вставлять: предпоследняя, потому что последняя не несёт важной информации
@@ -101,10 +122,10 @@ namespace excelApplicationFindAndCopy
                 int copyRowsCount;              // количество строк в листе, который будем копировать
                 int copyColumnsCount;           // количество столбцов в листе, откуда будем копировать
                 // начиная со второго листа будем копировать на первый
+                print("Лист 1\n");
                 for (int i = 2; i <= sheetsCount; i++)
                 {
-                    richTextBox2.AppendText("Лист "+i+"\n");
-                    richTextBox2.ScrollToCaret();
+                    print("Лист "+i+"\n");
 
                     tmpCopySheet = workBook.Worksheets[i];
                     copyRowsCount = myExcel.getRowsCount(tmpCopySheet);
@@ -112,23 +133,23 @@ namespace excelApplicationFindAndCopy
                     // 1. Выделение копируемого диапазона: начиная со 2 строки по copyRowsCount - 2 строку
                     myExcel.CopyPasteRange(tmpCopySheet, pastedSheet, 2, 1, copyRowsCount - 2, copyColumnsCount, rowPasted, 1);
                     rowPasted += (copyRowsCount - 3);
-                    //if (i == 2) rowPasted--; // после первой вставки из-за заголовка, который нужно будет впредь игнорировать
                 }
-                richTextBox2.AppendText("Листы объединены.\n");
-                richTextBox2.ScrollToCaret();
+                print("Листы объединены.\n\nПрименение автовысоты всем строкам...\n\n");
                 // применим автовысоту для всех строк
                 pastedSheet.Range[pastedSheet.Cells[1, 1], pastedSheet.Cells[myExcel.getRowsCount(pastedSheet), myExcel.getColumnsCount(pastedSheet)]].EntireRow.AutoFit(); //применить автовысоту;
 
+                print("Удаление лишних листов...\n\n");
                 // удалим все остальные листы, кроме первого
                 for (int i = sheetsCount; i >= 2; i--)
                 {
                     workBook.Worksheets[i].Delete();
-                }    
-                MessageBox.Show("Файлы объединены");
+                }
+                print("Готово!");
+                print(" ");
 
                 //myExcel.setDataGridView(dataGridView1, pastedSheet, )
                 listBox1.Invoke(delegates.listBoxUpdater, new object[] { listBox1, workBook });
-                listBox1.SelectedIndex = 0;
+                listBox1.Invoke(delegates.listBoxSelectedIndexChanger, new object[] { listBox1, 0 });
             }
             else
             {
@@ -146,6 +167,34 @@ namespace excelApplicationFindAndCopy
                 xlApp.Quit();
             }
             System.Environment.Exit(1);
+        }
+
+        // автоскролл к введённой в textBox1 строке. по dataGridView1
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            if (isDataGridViewFilled) //!
+            {
+                int selectRow = 1;
+                // нужно поределить номер строки, введённый в textBox1
+                try { selectRow = Int32.Parse(textBox1.Text); }
+                catch { return; }
+                finally { }
+                if (selectRow < 1 || selectRow > dataGridView1.Rows.Count) return;
+                print("Распознано положительное число: " + selectRow + "\n");
+
+                // снятие выделения
+                dataGridView1.ClearSelection();
+                // выделение нужной строки
+                dataGridView1.Rows[selectRow - 1].Selected = true;
+                // скролл к выделенной строке
+                dataGridView1.FirstDisplayedScrollingRowIndex = selectRow - 1;
+            }
+        }
+
+        // очистка textBox1
+        private void button1_Click(object sender, EventArgs e)
+        {
+            textBox1.Text = "";
         }
     }
 }
