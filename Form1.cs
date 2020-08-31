@@ -31,13 +31,15 @@ namespace excelApplicationFindAndCopy
         {
             InitializeComponent();
             // тут выставляем значения по умолчанию для элементов формы
-           
+            comboBox1.SelectedIndex = 1;
+            comboBox2.SelectedIndex = 2;
+
             //ToolTip t6 = new ToolTip();
             //t6.SetToolTip(checkBox1, "Выводит в логи дополнительную информацию: что где найдено и какой диапазон ячеек при этом будет скопирован.\nНемного замедляет скорость отработки.");
         }
 
 
-        
+
         // ЗАПОЛНЕНИЕ DATA_GRID_VIEW СОДЕРЖИМЫМ
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -68,6 +70,8 @@ namespace excelApplicationFindAndCopy
         // Выбор папки и склейка всех находящихся так екселей в один
         private void button3_Click(object sender, EventArgs e)
         {
+            int rowIgnoredBeforeList = comboBox1.SelectedIndex;
+            int rowIgnoredAfterList = comboBox2.SelectedIndex;
             // Show the FolderBrowserDialog.
             DialogResult result = folderBrowserDialog1.ShowDialog();
             String path = "";
@@ -77,12 +81,12 @@ namespace excelApplicationFindAndCopy
 
                 print("Шаг 1. Начало объединения файлов в один на отдельные листы.\n\n");
                 string[] allFiles = Directory.GetFiles(path);
-                //// если файл всего один в папке
-                //if (allFiles.Length == 1)
-                //{
-                //    MessageBox.Show("Тут всего один файл.\nТут объединять нечего.\n\nВыберите папку, содержащую более чем один файл!");
-                //    return;
-                //}
+                // если файл всего один в папке
+                if (allFiles.Length == 1)
+                {
+                    MessageBox.Show("Тут всего один файл.\nТут объединять нечего.\n\nВыберите папку, содержащую более чем один файл!");
+                    return;
+                }
                 print("Порядок объединения файлов:\n");
                 foreach (String file in allFiles)
                 {
@@ -104,7 +108,7 @@ namespace excelApplicationFindAndCopy
                     xlFileName = "";
                     return;
                 }
-                
+
 
                 // книга
                 workBook = xlApp.Workbooks.Open(xlFileName, false, false); //открываем наш файл
@@ -114,8 +118,8 @@ namespace excelApplicationFindAndCopy
 
                 print("Шаг 2. Начинаем объединять листы (" + sheetsCount + ")...\n");
                 // Подготовка к объединению содержимого листов
-                Excel.Worksheet pastedSheet = workBook.Worksheets[1];   // лист, в который будем вставлять
-                int rowPasted = myExcel.getRowsCount(pastedSheet) - 1;  // строка, в которую будем вставлять: предпоследняя, потому что последняя не несёт важной информации
+                Excel.Worksheet pastedSheet = workBook.Worksheets[1];                       // лист, в который будем вставлять
+                int rowPasted = myExcel.getRowsCount(pastedSheet) - rowIgnoredBeforeList - 1;   // строка, в которую будем вставлять: предпоследняя, потому что последняя не несёт важной информации
                 xlApp.DisplayAlerts = false;
 
                 Excel.Worksheet tmpCopySheet;   // лист откуда будем копировать
@@ -125,14 +129,14 @@ namespace excelApplicationFindAndCopy
                 print("Лист 1\n");
                 for (int i = 2; i <= sheetsCount; i++)
                 {
-                    print("Лист "+i+"\n");
+                    print("Лист " + i + "\n");
 
                     tmpCopySheet = workBook.Worksheets[i];
                     copyRowsCount = myExcel.getRowsCount(tmpCopySheet);
                     copyColumnsCount = myExcel.getColumnsCount(tmpCopySheet);
-                    // 1. Выделение копируемого диапазона: начиная со 2 строки по copyRowsCount - 2 строку
-                    myExcel.CopyPasteRange(tmpCopySheet, pastedSheet, 2, 1, copyRowsCount - 2, copyColumnsCount, rowPasted, 1);
-                    rowPasted += (copyRowsCount - 3);
+                    // 1. Выделение копируемого диапазона: начиная со (1+rowIgnoredBeforeList) строки по (copyRowsCount - rowIgnoredAfterList) строку
+                    myExcel.CopyPasteRange(tmpCopySheet, pastedSheet, (1 + rowIgnoredBeforeList), 1, (copyRowsCount - rowIgnoredAfterList), copyColumnsCount, rowPasted, 1);
+                    rowPasted += (copyRowsCount - (rowIgnoredAfterList + rowIgnoredBeforeList));
                 }
                 print("Листы объединены.\n\nПрименение автовысоты всем строкам...\n\n");
                 // применим автовысоту для всех строк
