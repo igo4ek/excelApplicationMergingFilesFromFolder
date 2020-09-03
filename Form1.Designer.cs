@@ -60,6 +60,7 @@
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -292,13 +293,14 @@
             "11",
             "12",
             "13"});
-            this.comboBox1.Location = new System.Drawing.Point(1003, 9);
+            this.comboBox1.Location = new System.Drawing.Point(872, 9);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(52, 21);
             this.comboBox1.TabIndex = 48;
             // 
             // comboBox2
             // 
+            this.comboBox2.Enabled = false;
             this.comboBox2.FormattingEnabled = true;
             this.comboBox2.Items.AddRange(new object[] {
             "0",
@@ -315,7 +317,7 @@
             "11",
             "12",
             "13"});
-            this.comboBox2.Location = new System.Drawing.Point(1003, 36);
+            this.comboBox2.Location = new System.Drawing.Point(872, 36);
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(52, 21);
             this.comboBox2.TabIndex = 49;
@@ -323,7 +325,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(765, 12);
+            this.label2.Location = new System.Drawing.Point(634, 12);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(232, 13);
             this.label2.TabIndex = 50;
@@ -332,17 +334,31 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(765, 39);
+            this.label3.Location = new System.Drawing.Point(634, 39);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(224, 13);
             this.label3.TabIndex = 51;
             this.label3.Text = "Кол-во игнорируемых строк после списка:";
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Checked = true;
+            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox1.Location = new System.Drawing.Point(939, 38);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(116, 17);
+            this.checkBox1.TabIndex = 52;
+            this.checkBox1.Text = "Автоопределение";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1310, 697);
+            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.comboBox2);
@@ -402,6 +418,7 @@
         private System.Windows.Forms.ComboBox comboBox2;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
 

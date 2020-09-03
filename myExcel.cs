@@ -65,6 +65,52 @@ namespace excelApplicationFindAndCopy
         }
 
         /// <summary>
+        /// Возвращает максимально часто встречающееся число строк
+        /// </summary>
+        /// <param name="sheet"></param>
+        /// <param name="adrMaker"></param>
+        /// <returns></returns>
+        public static int getMaxMeetingRowsCount(Excel.Worksheet sheet, myExcelAdressMaker adrMaker)
+        {
+            // отберем количества строк в КАЖДОМ столбце
+            int columnsCount = getColumnsCount(sheet);  // количество столбцов
+            List<int> rowsCountList = new List<int>();  // количество строк в каждом столбце
+            for (int j = 1; j <= columnsCount; j++)
+            {
+                rowsCountList.Add(sheet.Cells[sheet.Rows.Count, adrMaker.getLetter(j)].End[Excel.XlDirection.xlUp].Row); // последняя заполненная строка в столбце j
+            }
+
+            // отсортируем по возрастанию
+            rowsCountList.Sort();
+
+            // найдем наиболее часто встречающееся число количества столбцов
+            int presentValue = rowsCountList[0];
+            int count = 0;
+            List<int> valuesList = new List<int>(); // список оригинальных значений
+            List<int> countsList = new List<int>(); // список количеств этих значений
+            valuesList.Add(presentValue);
+            for (int i = 0; i < rowsCountList.Count; i++)
+            {
+                if (rowsCountList[i] != presentValue)
+                {
+                    valuesList.Add(rowsCountList[i]);
+                    countsList.Add(count);
+
+                    // подготовка к дальнейшему перебору
+                    presentValue = rowsCountList[i];
+                    count = 0;
+                }
+                count++;
+                if (i == rowsCountList.Count - 1)
+                {
+                    countsList.Add(count);
+                }
+            }
+            return valuesList[countsList.IndexOf(countsList.Max())]; // число, встречавшееся максимальное количество раз
+        }
+
+
+        /// <summary>
         /// Возвращает количество столбцов на листе sheet...
         /// </summary>
         /// <param name="sheet">Лист, для которого нужно узнать количество столбцов</param>

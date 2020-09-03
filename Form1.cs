@@ -71,7 +71,7 @@ namespace excelApplicationFindAndCopy
         private void button3_Click(object sender, EventArgs e)
         {
             int rowIgnoredBeforeList = comboBox1.SelectedIndex;
-            int rowIgnoredAfterList = comboBox2.SelectedIndex;
+            int rowIgnoredAfterList = checkBox1.Checked ? 0 : comboBox2.SelectedIndex; // если включено автоопределение, то лишних строк не будет
             // Show the FolderBrowserDialog.
             DialogResult result = folderBrowserDialog1.ShowDialog();
             String path = "";
@@ -119,7 +119,7 @@ namespace excelApplicationFindAndCopy
                 print("Шаг 2. Начинаем объединять листы (" + sheetsCount + ")...\n");
                 // Подготовка к объединению содержимого листов
                 Excel.Worksheet pastedSheet = workBook.Worksheets[1];                       // лист, в который будем вставлять
-                int rowPasted = myExcel.getRowsCount(pastedSheet) - rowIgnoredBeforeList - 1;   // строка, в которую будем вставлять: предпоследняя, потому что последняя не несёт важной информации
+                int rowPasted = myExcel.getRowsCount(pastedSheet) - rowIgnoredBeforeList;   // строка, в которую будем вставлять: предпоследняя, потому что последняя не несёт важной информации
                 xlApp.DisplayAlerts = false;
 
                 Excel.Worksheet tmpCopySheet;   // лист откуда будем копировать
@@ -132,7 +132,8 @@ namespace excelApplicationFindAndCopy
                     print("Лист " + i + "\n");
 
                     tmpCopySheet = workBook.Worksheets[i];
-                    copyRowsCount = myExcel.getRowsCount(tmpCopySheet);
+                    // количество строк в зависимости от того, утановлено ли автоопределение:
+                    copyRowsCount = checkBox1.Checked ? myExcel.getMaxMeetingRowsCount(tmpCopySheet, adrMaker) : myExcel.getRowsCount(tmpCopySheet);
                     copyColumnsCount = myExcel.getColumnsCount(tmpCopySheet);
                     // 1. Выделение копируемого диапазона: начиная со (1+rowIgnoredBeforeList) строки по (copyRowsCount - rowIgnoredAfterList) строку
                     myExcel.CopyPasteRange(tmpCopySheet, pastedSheet, (1 + rowIgnoredBeforeList), 1, (copyRowsCount - rowIgnoredAfterList), copyColumnsCount, rowPasted, 1);
@@ -199,6 +200,12 @@ namespace excelApplicationFindAndCopy
         private void button1_Click(object sender, EventArgs e)
         {
             textBox1.Text = "";
+        }
+
+        // автивация/ деактивация комбоБокса
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            comboBox2.Enabled = !checkBox1.Checked;
         }
     }
 }
