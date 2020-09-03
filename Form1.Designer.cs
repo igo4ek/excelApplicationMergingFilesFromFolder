@@ -88,7 +88,7 @@
             this.richTextBox2.Location = new System.Drawing.Point(21, 456);
             this.richTextBox2.Name = "richTextBox2";
             this.richTextBox2.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.richTextBox2.Size = new System.Drawing.Size(1281, 229);
+            this.richTextBox2.Size = new System.Drawing.Size(1281, 196);
             this.richTextBox2.TabIndex = 23;
             this.richTextBox2.Text = resources.GetString("richTextBox2.Text");
             // 
@@ -246,7 +246,7 @@
             this.button3.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.button3.Location = new System.Drawing.Point(1061, 6);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(237, 52);
+            this.button3.Size = new System.Drawing.Size(237, 46);
             this.button3.TabIndex = 45;
             this.button3.Text = "Папка...\r\n(Объединение всех Excel-файлов в один)";
             this.button3.UseVisualStyleBackColor = true;
@@ -357,7 +357,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1310, 697);
+            this.ClientSize = new System.Drawing.Size(1310, 659);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
